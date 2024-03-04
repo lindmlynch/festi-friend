@@ -32,7 +32,7 @@ class PerformanceAdapter : RecyclerView.Adapter<PerformanceAdapter.PerformanceVi
             binding.apply {
                 performanceName.text = performance.name
                 performanceDescription.text = performance.description
-                performanceTime.text = "${performance.day} ${performance.startTime} - ${performance.endTime}"
+                performanceTime.text = "${performance.startTime} - ${performance.endTime}"
                 performanceLocation.text = performance.location
             }
         }
