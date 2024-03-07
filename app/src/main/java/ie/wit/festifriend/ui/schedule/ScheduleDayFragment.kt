@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import ie.wit.festifriend.adapters.PerformanceAdapter
 import ie.wit.festifriend.databinding.FragmentDayScheduleBinding
@@ -35,12 +36,18 @@ class ScheduleDayFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = PerformanceAdapter()
+
+        adapter = PerformanceAdapter { artist ->
+            val action = ScheduleFragmentDirections.actionNavigationScheduleToArtistDetailFragment(artist)
+            findNavController().navigate(action)
+        }
+
         binding.rvPerformances.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = this@ScheduleDayFragment.adapter
         }
     }
+
 
     private fun setupPerformances() {
 

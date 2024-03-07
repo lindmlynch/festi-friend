@@ -15,11 +15,29 @@
         android:id="@+id/navigation_schedule"
         android:name="ie.wit.festifriend.ui.schedule.ScheduleFragment"
         android:label="@string/title_schedule"
-        tools:layout="@layout/fragment_schedule" />
+        tools:layout="@layout/fragment_schedule" >
+        <action
+            android:id="@+id/action_navigation_schedule_to_artistDetailFragment"
+            app:destination="@id/artistDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="ie.wit.festifriend.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/artistDetailFragment"
+        android:name="ie.wit.festifriend.ui.detail.ArtistDetailFragment"
+        android:label="@string/title_artists"
+        tools:layout="@layout/fragment_artist_detail">
+        <argument
+            android:name="artist"
+            app:argType="ie.wit.festifriend.models.ArtistModel"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_artistDetailFragment_to_navigation_schedule"
+            app:destination="@id/navigation_schedule" />
+    </fragment>
+
 </navigation>
