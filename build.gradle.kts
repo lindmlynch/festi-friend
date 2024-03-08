@@ -10,4 +10,5 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.50" apply false
     id("org.jetbrains.kotlin.plugin.parcelize") version "1.7.10" apply false
     id("androidx.navigation.safeargs") version "2.5.1" apply false
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false
 }

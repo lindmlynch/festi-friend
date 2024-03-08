@@ -39,5 +39,10 @@
             android:id="@+id/action_artistDetailFragment_to_navigation_schedule"
             app:destination="@id/navigation_schedule" />
     </fragment>
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="ie.wit.festifriend.ui.map.MapsFragment"
+        android:label="FestiFriend Map"
+        tools:layout="@layout/fragment_maps" />
 
 </navigation>
