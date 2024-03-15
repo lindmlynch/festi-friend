@@ -13,7 +13,7 @@ data class PerformanceModel(
     var day: String? = "",
     var startTime: String? = "",
     var endTime: String? = "",
-    var location: String? = "",
+    var location: String = "",
     var artist: ArtistModel = ArtistModel()
 ): Parcelable
 
