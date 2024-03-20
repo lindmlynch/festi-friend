@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import ie.wit.festifriend.adapters.PerformanceAdapter
 import ie.wit.festifriend.databinding.FragmentDayScheduleBinding
+import ie.wit.festifriend.models.PerformanceModel
 
 class ScheduleDayFragment : Fragment() {
 
@@ -17,7 +18,20 @@ class ScheduleDayFragment : Fragment() {
 
     private val binding get() = _binding!!
     private lateinit var scheduleViewModel: ScheduleViewModel
-    private lateinit var adapter: PerformanceAdapter
+
+
+    private val adapter: PerformanceAdapter by lazy {
+        PerformanceAdapter({ artist ->
+            val action = ScheduleFragmentDirections.actionNavigationScheduleToArtistDetailFragment(artist)
+            findNavController().navigate(action)
+        }, { performance ->
+            if (performance.favourite) {
+                scheduleViewModel.removeFavourite(performance)
+            } else {
+                scheduleViewModel.addFavourite(performance)
+            }
+        })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,31 +46,28 @@ class ScheduleDayFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
         setupPerformances()
+
+        scheduleViewModel.refreshFavourites()
     }
 
     private fun setupRecyclerView() {
-
-        adapter = PerformanceAdapter { artist ->
-            val action = ScheduleFragmentDirections.actionNavigationScheduleToArtistDetailFragment(artist)
-            findNavController().navigate(action)
-        }
-
         binding.rvPerformances.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = this@ScheduleDayFragment.adapter
         }
     }
 
-
     private fun setupPerformances() {
-
-        arguments?.getString("day")?.let { day ->
+        val day = arguments?.getString("day")
+        day?.let {
             scheduleViewModel.filterPerformancesByDay(day)
         }
 
-        scheduleViewModel.performances.observe(viewLifecycleOwner) { performances ->
-            adapter.setPerformances(performances)
+        scheduleViewModel.performances.observe(viewLifecycleOwner) { allPerformances ->
+            val dayPerformances = allPerformances.filter { it.day.equals(day, ignoreCase = true) }
+            adapter.setPerformances(dayPerformances)
         }
     }
 
@@ -76,4 +87,3 @@ class ScheduleDayFragment : Fragment() {
         }
     }
 }
-

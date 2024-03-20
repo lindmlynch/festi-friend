@@ -3,30 +3,35 @@ package ie.wit.festifriend.ui.schedule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import ie.wit.festifriend.models.PerformanceModel
 
 class ScheduleViewModel : ViewModel() {
 
     private val dbPerformances = FirebaseDatabase.getInstance().getReference("performances")
+    private val dbFavourites = FirebaseDatabase.getInstance().getReference("favourites")
 
     private val _allPerformances = MutableLiveData<List<PerformanceModel>>().apply { value = emptyList() }
     private val _performances = MutableLiveData<List<PerformanceModel>>()
     val performances: LiveData<List<PerformanceModel>> = _performances
 
-    private val valueEventListener = object : ValueEventListener {
+    private val _favourites = MutableLiveData<Set<String>>()
+
+    private val performanceEventListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
             val performances = mutableListOf<PerformanceModel>()
             snapshot.children.forEach { daySnapshot ->
-                val day = daySnapshot.key ?: return
                 daySnapshot.children.forEach { performanceSnapshot ->
-                    val performance = performanceSnapshot.getValue(PerformanceModel::class.java)
-                    performance?.day = day
-                    performances.add(performance ?: return@forEach)
+                    val performance = performanceSnapshot.getValue(PerformanceModel::class.java)?.apply {
+                        id = performanceSnapshot.key
+                        day = daySnapshot.key
+                    }
+                    performance?.let { performances.add(it) }
                 }
             }
             _allPerformances.value = performances
-
+            updatePerformances(_favourites.value ?: emptySet())
         }
 
         override fun onCancelled(error: DatabaseError) {
@@ -34,20 +39,78 @@ class ScheduleViewModel : ViewModel() {
         }
     }
 
-    init {
-        loadPerformances()
+
+    private val favouritesEventListener = object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+
+            val userFavourites = snapshot.children
+                .filter { it.getValue(Boolean::class.java) ?: false }
+                .map { it.key ?: "" }
+                .toSet()
+            _favourites.value = userFavourites
+            updatePerformances(userFavourites)
+        }
+        override fun onCancelled(error: DatabaseError) { }
     }
 
-    private fun loadPerformances() {
-        dbPerformances.addValueEventListener(valueEventListener)
+    init {
+        dbPerformances.addValueEventListener(performanceEventListener)
+        FirebaseAuth.getInstance().currentUser?.uid?.let { userId ->
+            dbFavourites.child(userId).addValueEventListener(favouritesEventListener)
+        }
+    }
+
+    private fun updatePerformances(favouritesSet: Set<String>) {
+        _performances.value = _allPerformances.value?.map { performance ->
+            performance.copy(favourite = favouritesSet.contains(performance.id))
+        }
     }
 
     fun filterPerformancesByDay(day: String) {
-        _performances.value = _allPerformances.value?.filter { it.day.equals(day, ignoreCase = true) } ?: emptyList()
+        _performances.value = _allPerformances.value?.filter { it.day.equals(day, ignoreCase = true) }
+    }
+
+    fun addFavourite(performance: PerformanceModel) {
+        val performanceId = performance.id
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (performanceId != null && userId != null) {
+            dbFavourites.child(userId).child(performanceId).setValue(true)
+                .addOnSuccessListener {
+
+                }
+                .addOnFailureListener {
+
+                }
+        }
+    }
+
+    fun removeFavourite(performance: PerformanceModel) {
+        val performanceId = performance.id
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (performanceId != null && userId != null) {
+            dbFavourites.child(userId).child(performanceId).removeValue()
+                .addOnSuccessListener {
+
+                }
+                .addOnFailureListener {
+
+                }
+        }
+    }
+
+    fun refreshFavourites() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            dbFavourites.child(userId).addListenerForSingleValueEvent(favouritesEventListener)
+        }
     }
 
     override fun onCleared() {
-        super.onCleared()
-        dbPerformances.removeEventListener(valueEventListener)
+        dbPerformances.removeEventListener(performanceEventListener)
+        FirebaseAuth.getInstance().currentUser?.uid?.let { userId ->
+            dbFavourites.child(userId).removeEventListener(favouritesEventListener)
+        }
     }
 }

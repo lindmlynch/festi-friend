@@ -14,6 +14,7 @@ data class PerformanceModel(
     var startTime: String? = "",
     var endTime: String? = "",
     var location: String = "",
-    var artist: ArtistModel = ArtistModel()
+    var artist: ArtistModel = ArtistModel(),
+    var favourite: Boolean = false
 ): Parcelable
 
