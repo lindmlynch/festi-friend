@@ -22,10 +22,18 @@
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="ie.wit.festifriend.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_community"
+        android:name="ie.wit.festifriend.ui.community.CommunityFragment"
+        android:label="@string/title_community"
+        tools:layout="@layout/fragment_community" />
+    <fragment
+        android:id="@+id/postFragment"
+        android:name="ie.wit.festifriend.ui.community.PostFragment"
+        android:label="Post"
+        tools:layout="@layout/fragment_post" />
+    <action
+        android:id="@+id/action_communityFragment_to_postFragment"
+        app:destination="@id/postFragment" />
     <fragment
         android:id="@+id/artistDetailFragment"
         android:name="ie.wit.festifriend.ui.detail.ArtistDetailFragment"

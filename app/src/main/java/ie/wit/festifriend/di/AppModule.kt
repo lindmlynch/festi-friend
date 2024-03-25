@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ie.wit.festifriend.api.ApiService
+import ie.wit.festifriend.repositories.CommunityRepository
 import ie.wit.festifriend.utils.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -25,5 +26,9 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideCommunityRepository(): CommunityRepository = CommunityRepository()
 
 }

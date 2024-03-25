@@ -2,7 +2,7 @@
     <string name="app_name">FestiFriend</string>
     <string name="title_home">Home</string>
     <string name="title_schedule">Schedule</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_community">Community</string>
     <string name="title_map">Map</string>
     <string name="title_artists">Artists</string>
     <string name="artist_image">Artists</string>
@@ -28,4 +28,13 @@
     <string name="firebase_user_management">Firebase User Management</string>
     <string name="emailpassword_status_fmt">Email User: %1$s (verified: %2$b)</string>
     <string name="emailpassword_title_text">Please Login Below</string>
+
+
+    <string name="preview_image">Image Preview</string>
+    <string name="select_image">Select Image</string>
+    <string name="your_review">Your review...</string>
+    <string name="submit_post">Submit Post</string>
+    <string name="add_post">Add Post</string>
+
+
 </resources>
