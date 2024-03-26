@@ -17,6 +17,8 @@ class ScheduleViewModel : ViewModel() {
     val performances: LiveData<List<PerformanceModel>> = _performances
 
     private val _favourites = MutableLiveData<Set<String>>()
+    private val _showFavourites = MutableLiveData(false)
+    val showFavourites: LiveData<Boolean> = _showFavourites
 
     private val performanceEventListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
@@ -39,7 +41,6 @@ class ScheduleViewModel : ViewModel() {
         }
     }
 
-
     private val favouritesEventListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
 
@@ -60,14 +61,41 @@ class ScheduleViewModel : ViewModel() {
         }
     }
 
+    fun setShowFavourites(showFavourites: Boolean) {
+        _showFavourites.value = showFavourites
+        updateFilteredPerformances()
+    }
+
     private fun updatePerformances(favouritesSet: Set<String>) {
         _performances.value = _allPerformances.value?.map { performance ->
             performance.copy(favourite = favouritesSet.contains(performance.id))
         }
     }
 
+    private fun updateFilteredPerformances() {
+        val favouritesSet = _favourites.value ?: emptySet()
+        val showFavourites = _showFavourites.value ?: false
+
+        val updatedPerformances = _allPerformances.value?.map { performance ->
+            performance.copy(favourite = favouritesSet.contains(performance.id))
+        }
+
+        _performances.value = if (showFavourites) {
+            updatedPerformances?.filter { it.favourite }
+        } else {
+            updatedPerformances
+        }
+    }
+
     fun filterPerformancesByDay(day: String) {
-        _performances.value = _allPerformances.value?.filter { it.day.equals(day, ignoreCase = true) }
+        val showFavourites = _showFavourites.value ?: false
+        val favouritesSet = _favourites.value ?: emptySet()
+
+        _performances.value = _allPerformances.value?.filter {
+            val dayMatches = it.day?.equals(day, ignoreCase = true) ?: false
+            val isFavourite = it.id?.let { id -> favouritesSet.contains(id) } ?: false
+            if (showFavourites) dayMatches && isFavourite else dayMatches
+        }
     }
 
     fun addFavourite(performance: PerformanceModel) {
