@@ -13,7 +13,12 @@
           "package_name": "ie.wit.festifriend"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "207248334243-g1b4s91apaopkj70iebhjca604ktnka6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyALXlgx0S3hpGB_YCT8MC1Imm5WwpU_MIs"
@@ -21,7 +26,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207248334243-g1b4s91apaopkj70iebhjca604ktnka6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
