@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import ie.wit.festifriend.databinding.FragmentHomeBinding
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -67,6 +68,15 @@ class HomeFragment : Fragment() {
                         Picasso.get().load(iconUrl).into(binding.ivForecastIcon3)
                     }
                 }
+            }
+        })
+        viewModel.festivalUpdates.observe(viewLifecycleOwner, Observer { updates ->
+            Timber.i("Updates observed: $updates")
+            if (updates.isNotEmpty()) {
+                val updatesText = updates.joinToString(separator = "\n\n")
+                binding.festivalUpdates.text = updatesText
+            } else {
+                binding.festivalUpdates.text = "No updates available at this time."
             }
         })
     }
