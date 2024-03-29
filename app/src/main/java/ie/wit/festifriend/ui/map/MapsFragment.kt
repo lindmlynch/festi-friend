@@ -13,14 +13,21 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.squareup.picasso.Picasso
 import ie.wit.festifriend.R
 import ie.wit.festifriend.models.VenueModel
-import ie.wit.festifriend.models.PerformanceModel
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.cardview.widget.CardView
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapsViewModel: MapsViewModel
     private var googleMap: GoogleMap? = null
+    private lateinit var venueDetailCard: CardView
+    private var selectedMarker: Marker? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,13 +41,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
+        venueDetailCard = view.findViewById(R.id.cardVenueDetails)
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        this.googleMap = googleMap
-        setupMap()
-        observeVenuesAndPerformances()
-    }
 
     private fun setupMap() {
         googleMap?.apply {
@@ -52,20 +55,72 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private fun observeVenuesAndPerformances() {
         mapsViewModel.getVenues().observe(viewLifecycleOwner) { venues ->
-            mapsViewModel.getPerformances().observe(viewLifecycleOwner) { performances ->
-                val performancesByVenue = performances.groupBy { it.location }
+            venues.forEach { venue ->
+                val loc = LatLng(venue.latitude, venue.longitude)
+                val marker = googleMap?.addMarker(
+                    MarkerOptions()
+                        .position(loc)
+                        .title(venue.name)
+                )
 
-                venues.forEach { venue ->
-                    val loc = LatLng(venue.latitude, venue.longitude)
-                    val performerNames = performancesByVenue[venue.name]?.joinToString(", ") { it.name ?: "Unknown" }
-                    googleMap?.addMarker(
-                        MarkerOptions()
-                            .position(loc)
-                            .title(venue.name)
-                            .snippet(performerNames)
-                    )
+                marker?.tag = venue
+            }
+        }
+        googleMap?.setOnMarkerClickListener { marker ->
+            if (selectedMarker == marker) {
+
+                venueDetailCard.visibility = View.GONE
+                selectedMarker = null
+            } else {
+                showVenueDetailsCard(marker)
+                selectedMarker = marker
+            }
+            true
+        }
+    }
+
+    private fun mapClickListener() {
+        googleMap?.setOnMapClickListener {
+            venueDetailCard.visibility = View.GONE
+            selectedMarker = null
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+        setupMap()
+        observeVenuesAndPerformances()
+        mapClickListener()
+    }
+
+
+    private fun showVenueDetailsCard(marker: Marker) {
+        val venue = marker.tag as? VenueModel
+
+        venue?.let {
+            val venueName = venueDetailCard.findViewById<TextView>(R.id.venueName)
+            val venueImage = venueDetailCard.findViewById<ImageView>(R.id.venueImage)
+            val performancesContainer = venueDetailCard.findViewById<LinearLayout>(R.id.performancesContainer)
+
+            venueName.text = venue.name
+            Picasso.get().load(venue.imageUrl).placeholder(R.drawable.ic_launcher_background).into(venueImage)
+
+            performancesContainer.removeAllViews()
+            mapsViewModel.getPerformances(venue.name).observe(viewLifecycleOwner) { performances ->
+                performances.forEach { performance ->
+                    val performanceView = LayoutInflater.from(context).inflate(R.layout.performance_item, performancesContainer, false)
+                    val performanceName = performanceView.findViewById<TextView>(R.id.performanceName)
+                    val performanceDay = performanceView.findViewById<TextView>(R.id.performanceDay)
+                    val performanceStartTime = performanceView.findViewById<TextView>(R.id.performanceStartTime)
+
+                    performanceName.text = performance.name
+                    performanceDay.text = performance.day
+                    performanceStartTime.text = performance.startTime
+
+                    performancesContainer.addView(performanceView)
                 }
             }
+            venueDetailCard.visibility = View.VISIBLE
         }
     }
 }

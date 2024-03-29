@@ -56,6 +56,15 @@ class MapsViewModel : ViewModel() {
         })
     }
 
+    fun getPerformances(venueName: String): LiveData<List<PerformanceModel>> {
+        val result = MutableLiveData<List<PerformanceModel>>()
+
+        performancesLiveData.observeForever { performances ->
+            result.value = performances.filter { it.location == venueName }
+        }
+        return result
+    }
+
     fun getVenues(): LiveData<List<VenueModel>> = venuesLiveData
-    fun getPerformances(): LiveData<List<PerformanceModel>> = performancesLiveData
+
 }
