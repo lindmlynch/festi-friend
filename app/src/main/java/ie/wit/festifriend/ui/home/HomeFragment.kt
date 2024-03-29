@@ -1,14 +1,26 @@
 package ie.wit.festifriend.ui.home
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.Transformation
 import dagger.hilt.android.AndroidEntryPoint
+import ie.wit.festifriend.R
 import ie.wit.festifriend.databinding.FragmentHomeBinding
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -27,8 +39,51 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        setupMenu()
         return binding.root
     }
+
+    private fun setupMenu() {
+        val menuHost: MenuHost = requireActivity()
+
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_home, menu)
+                val profileMenuItem = menu.findItem(R.id.profileImageView)
+                profileMenuItem.setActionView(R.layout.image_layout)
+
+                val profileImageView: ImageView? = profileMenuItem.actionView as? ImageView
+
+                val account = GoogleSignIn.getLastSignedInAccount(requireContext())
+                val photoUrl = account?.photoUrl
+
+                if (photoUrl != null) {
+                    Picasso.get()
+                        .load(photoUrl)
+                        .resize(80, 80)
+                        .transform(customTransformation())
+                        .centerCrop()
+                        .into(profileImageView)
+                } else {
+                    profileImageView?.setImageResource(R.drawable.image_placeholder_ic)
+                }
+            }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return false
+            }
+            override fun onPrepareMenu(menu: Menu) {
+                super.onPrepareMenu(menu)
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+    private fun customTransformation(): Transformation =
+        RoundedTransformationBuilder()
+            .borderColor(Color.WHITE)
+            .borderWidthDp(1F)
+            .cornerRadiusDp(40F)
+            .oval(true)
+            .build()
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
