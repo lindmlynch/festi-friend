@@ -1,24 +1,64 @@
 package ie.wit.festifriend.ui.map
 
-
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
+import com.google.android.gms.maps.GoogleMap
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import ie.wit.festifriend.models.PerformanceModel
 import ie.wit.festifriend.models.VenueModel
+import android.annotation.SuppressLint
+import android.app.Application
+import android.location.Location
+import android.os.Looper
+import androidx.lifecycle.AndroidViewModel
+import com.google.android.gms.location.*
+import timber.log.Timber
 
-class MapsViewModel : ViewModel() {
+@SuppressLint("MissingPermission")
+class MapsViewModel(application: Application) : AndroidViewModel(application) {
     private val db = FirebaseDatabase.getInstance()
     private val venuesLiveData = MutableLiveData<List<VenueModel>>()
     private val performancesLiveData = MutableLiveData<List<PerformanceModel>>()
 
+    lateinit var map : GoogleMap
+    var currentLocation = MutableLiveData<Location>()
+    var locationClient : FusedLocationProviderClient
+    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+        .setWaitForAccurateLocation(false)
+        .setMinUpdateIntervalMillis(5000)
+        .setMaxUpdateDelayMillis(15000)
+        .build()
+
+    val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            currentLocation.value = locationResult.locations.last()
+        }
+    }
+
     init {
         getVenue()
         getPerformance()
+        locationClient = LocationServices.getFusedLocationProviderClient(application)
+        locationClient.requestLocationUpdates(locationRequest, locationCallback,
+            Looper.getMainLooper())
+    }
+
+    fun updateCurrentLocation() {
+        if(locationClient.lastLocation.isSuccessful)
+            locationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    currentLocation.value = location!!
+                    Timber.i("MAP VM LOC SUCCESS: %s", currentLocation.value)
+                }
+        else
+            currentLocation.value = Location("Default").apply {
+                latitude = 52.14113
+                longitude = -10.26704
+            }
+        Timber.i("MAP VM LOC : %s", currentLocation.value)
     }
 
     private fun getVenue() {

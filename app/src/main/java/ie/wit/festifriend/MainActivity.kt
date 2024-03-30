@@ -1,8 +1,11 @@
 package ie.wit.festifriend
 
+import android.annotation.SuppressLint
+import android.location.Location
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -16,12 +19,17 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.lifecycle.Observer
 import ie.wit.festifriend.ui.auth.LoggedInViewModel
 import ie.wit.festifriend.ui.auth.Login
+import ie.wit.festifriend.ui.map.MapsViewModel
+import ie.wit.festifriend.utils.checkLocationPermissions
+import ie.wit.festifriend.utils.isPermissionGranted
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var loggedInViewModel : LoggedInViewModel
+    private val mapsViewModel : MapsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +49,10 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        if(checkLocationPermissions(this)) {
+            mapsViewModel.updateCurrentLocation()
+        }
     }
 
     public override fun onStart() {
@@ -66,5 +78,20 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, Login::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (isPermissionGranted(requestCode, grantResults))
+            mapsViewModel.updateCurrentLocation()
+        else {
+
+            mapsViewModel.currentLocation.value = Location("Default").apply {
+                latitude = 52.1409
+                longitude = -10.3671
+            }
+        }
+        Timber.i("LOC : %s", mapsViewModel.currentLocation.value)
     }
 }

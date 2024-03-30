@@ -1,5 +1,9 @@
 package ie.wit.festifriend.ui.map
 
+import android.annotation.SuppressLint
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +32,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private lateinit var venueDetailCard: CardView
     private var selectedMarker: Marker? = null
 
+    @SuppressLint("MissingPermission")
+    private val callback = OnMapReadyCallback { googleMap ->
+        this.googleMap = googleMap
+        setupMap()
+        enableUserLocation()
+        observeVenuesAndPerformances()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,10 +51,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(this)
+        mapFragment?.getMapAsync(callback)
         venueDetailCard = view.findViewById(R.id.cardVenueDetails)
     }
 
+    private fun enableUserLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+        googleMap?.isMyLocationEnabled = true
+        googleMap?.uiSettings?.isMyLocationButtonEnabled = true
+    }
 
     private fun setupMap() {
         googleMap?.apply {
