@@ -7,12 +7,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import ie.wit.festifriend.databinding.FragmentPostBinding
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
+import ie.wit.festifriend.R
 import ie.wit.festifriend.models.PostModel
 
 @AndroidEntryPoint
@@ -24,6 +27,8 @@ class PostFragment : Fragment() {
     private val communityViewModel: CommunityViewModel by viewModels()
     private var selectedImageUri: Uri? = null
 
+    private val args: PostFragmentArgs by navArgs()
+    private var editingPost: PostModel? = null
 
     private val imagePickerResultLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
@@ -32,12 +37,25 @@ class PostFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPostBinding.inflate(inflater, container, false)
-        setupUI()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        editingPost = args.post
+
+        if (editingPost != null) {
+            binding.reviewEditText.setText(editingPost?.text)
+            editingPost?.imageUrl?.let {
+                Picasso.get().load(it).into(binding.imagePreview)
+            }
+            binding.submitPostButton.text = getString(R.string.update_post)
+        } else {
+            binding.submitPostButton.text = getString(R.string.submit_post)
+        }
+        setupUI()
     }
 
     private fun setupUI() {
@@ -47,40 +65,57 @@ class PostFragment : Fragment() {
 
         binding.submitPostButton.setOnClickListener {
             val reviewText = binding.reviewEditText.text.toString()
-            if (reviewText.isNotEmpty() && selectedImageUri != null) {
-                communityViewModel.uploadImage(selectedImageUri!!)
-                observeImageUpload(reviewText)
+            if (reviewText.isNotEmpty()) {
+                if (selectedImageUri != null || editingPost != null) {
+                    if (editingPost == null) {
+                        selectedImageUri?.let { uri ->
+                            communityViewModel.uploadImage(uri)
+                            observeImageUpload(reviewText)
+                        } ?: Toast.makeText(context, "Please select an image.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        updateExistingPost(reviewText)
+                    }
+                } else {
+                    Toast.makeText(context, "Please select an image.", Toast.LENGTH_SHORT).show()
+                }
             } else {
-                Toast.makeText(context, "Please enter a review and select an image.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Please enter a review.", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun observeImageUpload(reviewText: String) {
         communityViewModel.imageUploadUrl.observe(viewLifecycleOwner) { imageUrl ->
-            if (imageUrl != null) {
-                postReview(reviewText, imageUrl)
-            } else {
-                Toast.makeText(context, "Failed to upload image.", Toast.LENGTH_LONG).show()
-            }
+            imageUrl?.let { url ->
+                postReview(reviewText, url)
+            } ?: Toast.makeText(context, "Failed to upload image.", Toast.LENGTH_LONG).show()
             communityViewModel.imageUploadUrl.removeObservers(viewLifecycleOwner)
         }
     }
 
     private fun postReview(reviewText: String, imageUrl: String) {
-        val userEmail = FirebaseAuth.getInstance().currentUser?.email ?: "Anonymous"
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
-
         val postModel = PostModel(
-            userId = userId,
-            userName = userEmail,
+            userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+            userName = FirebaseAuth.getInstance().currentUser?.email ?: "Anonymous",
             text = reviewText,
             imageUrl = imageUrl,
             timestamp = System.currentTimeMillis()
         )
-        communityViewModel.postReview(postModel)
-        Toast.makeText(context, "Review posted successfully!", Toast.LENGTH_SHORT).show()
+        if (editingPost == null) {
+            communityViewModel.postReview(postModel)
+        } else {
+            communityViewModel.updatePost(editingPost!!.id, postModel)
+        }
         navigateBackToCommunityFragment()
+    }
+
+    private fun updateExistingPost(reviewText: String) {
+        val updatedPost = editingPost?.copy(text = reviewText)
+        updatedPost?.let {
+            communityViewModel.updatePost(it.id, it)
+            Toast.makeText(context, "Post updated successfully!", Toast.LENGTH_SHORT).show()
+            navigateBackToCommunityFragment()
+        }
     }
 
     private fun navigateBackToCommunityFragment() {

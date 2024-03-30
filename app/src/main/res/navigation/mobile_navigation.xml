@@ -30,10 +30,16 @@
         android:id="@+id/postFragment"
         android:name="ie.wit.festifriend.ui.community.PostFragment"
         android:label="Post"
-        tools:layout="@layout/fragment_post" />
+        tools:layout="@layout/fragment_post">
+        <argument
+            android:name="post"
+            app:argType="ie.wit.festifriend.models.PostModel"
+            app:nullable="true" />
+    </fragment>
     <action
         android:id="@+id/action_communityFragment_to_postFragment"
         app:destination="@id/postFragment" />
+
     <fragment
         android:id="@+id/artistDetailFragment"
         android:name="ie.wit.festifriend.ui.detail.ArtistDetailFragment"

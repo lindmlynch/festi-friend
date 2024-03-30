@@ -19,6 +19,7 @@ class CommunityRepository {
                 val posts = mutableListOf<PostModel>()
                 for (postSnapshot in dataSnapshot.children) {
                     val post = postSnapshot.getValue(PostModel::class.java)
+                    post?.id = postSnapshot.key
                     post?.let { posts.add(it) }
                 }
                 onResult(posts)
@@ -53,5 +54,17 @@ class CommunityRepository {
             .addOnFailureListener {
                 onComplete(null)
             }
+    }
+
+    fun updatePost(postId: String, updatedPost: PostModel, onComplete: (Boolean) -> Unit) {
+        dbPosts.child(postId).setValue(updatedPost).addOnCompleteListener { task ->
+            onComplete(task.isSuccessful)
+        }
+    }
+
+    fun deletePost(postId: String, onComplete: (Boolean) -> Unit) {
+        dbPosts.child(postId).removeValue().addOnCompleteListener { task ->
+            onComplete(task.isSuccessful)
+        }
     }
 }

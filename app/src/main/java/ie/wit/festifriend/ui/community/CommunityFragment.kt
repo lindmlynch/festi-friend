@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import ie.wit.festifriend.adapters.PostAdapter
 import ie.wit.festifriend.databinding.FragmentCommunityBinding
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import ie.wit.festifriend.R
 
 @AndroidEntryPoint
@@ -24,8 +25,7 @@ class CommunityFragment : Fragment() {
     private lateinit var postAdapter: PostAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCommunityBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -35,12 +35,26 @@ class CommunityFragment : Fragment() {
         setupRecyclerView()
         setupFAB()
         observeViewModel()
-
         communityViewModel.fetchPosts()
     }
 
     private fun setupRecyclerView() {
-        postAdapter = PostAdapter(listOf())
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        postAdapter = PostAdapter(
+            listOf(),
+            currentUserId,
+            onEdit = { postModel ->
+                val action = CommunityFragmentDirections.actionCommunityFragmentToPostFragment(postModel)
+                findNavController().navigate(action)
+            },
+            onDelete = { postModel ->
+                postModel.id?.let { postId ->
+                    communityViewModel.deletePost(postId)
+                } ?: run {
+                    Toast.makeText(context, "Error: Post ID is null.", Toast.LENGTH_LONG).show()
+                }
+            }
+        )
         binding.postRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = postAdapter
@@ -49,9 +63,11 @@ class CommunityFragment : Fragment() {
 
     private fun setupFAB() {
         binding.fab.setOnClickListener {
-            findNavController().navigate(R.id.action_communityFragment_to_postFragment)
+            val action = CommunityFragmentDirections.actionCommunityFragmentToPostFragment(null)
+            findNavController().navigate(action)
         }
     }
+
 
     private fun observeViewModel() {
         communityViewModel.posts.observe(viewLifecycleOwner) { posts ->
@@ -61,12 +77,24 @@ class CommunityFragment : Fragment() {
         communityViewModel.uploadSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
                 Toast.makeText(context, "Review posted successfully", Toast.LENGTH_SHORT).show()
-                communityViewModel.fetchPosts()
             } else {
                 Toast.makeText(context, "Failed to post review", Toast.LENGTH_SHORT).show()
             }
         }
 
+        communityViewModel.updateSuccess.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Toast.makeText(context, "Post updated successfully", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        communityViewModel.deleteSuccess.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Toast.makeText(context, "Post deleted successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -74,4 +102,3 @@ class CommunityFragment : Fragment() {
         _binding = null
     }
 }
-
