@@ -56,7 +56,7 @@
     <fragment
         android:id="@+id/mapsFragment"
         android:name="ie.wit.festifriend.ui.map.MapsFragment"
-        android:label="FestiFriend Map"
+        android:label="@string/title_map"
         tools:layout="@layout/fragment_maps" />
 
 </navigation>

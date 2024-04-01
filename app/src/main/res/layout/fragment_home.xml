@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/background"
+        android:background="@color/black"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -16,7 +16,7 @@
             android:id="@+id/festivalImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/festival_image"
+            android:src="@drawable/festival_logo"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             android:contentDescription="@string/festival_image"/>
@@ -24,9 +24,9 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Festival Updates:"
+            android:text="Festival Updates"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textColor="@color/white"
+            android:textColor="@color/ov_beige"
             android:gravity="center"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"/>
@@ -38,95 +38,122 @@
             android:textColor="@color/white"
             android:background="@drawable/updates_background"
             android:padding="16dp"
-            android:textSize="18sp"/>
+            android:textSize="18sp"
+            android:text="Live updates will be shown here"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Weather Dingle:"
+            android:text="Weather Dingle"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textColor="@color/white"
+            android:textColor="@color/ov_beige"
             android:gravity="center"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="4dp"/>
 
-        <LinearLayout
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:padding="16dp"
-            android:background="@drawable/weather_background">
+            android:background="@drawable/weather_background"
+            android:padding="16dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                android:gravity="center">
 
-                <ImageView
-                    android:id="@+id/ivForecastIcon1"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_weather_placeholder" />
-
-                <TextView
-                    android:id="@+id/tvForecast1"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:textColor="@color/white"
-                    android:textSize="18sp" />
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                    <ImageView
+                        android:id="@+id/ivForecastIcon1"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_weather_placeholder" />
 
-                <ImageView
-                    android:id="@+id/ivForecastIcon2"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_weather_placeholder" />
+                    <TextView
+                        android:id="@+id/tvForecastDayTemp1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:text="Friday: 9°C"/>
 
-                <TextView
-                    android:id="@+id/tvForecast2"
-                    android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvForecastDesc1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:text="overcast clouds"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:textColor="@color/white"
-                    android:textSize="18sp" />
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                    <ImageView
+                        android:id="@+id/ivForecastIcon2"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_weather_placeholder" />
 
-                <ImageView
-                    android:id="@+id/ivForecastIcon3"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_weather_placeholder" />
+                    <TextView
+                        android:id="@+id/tvForecastDayTemp2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:text="Saturday: 9°C"/>
 
-                <TextView
-                    android:id="@+id/tvForecast3"
-                    android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvForecastDesc2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:text="overcast clouds"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:textColor="@color/white"
-                    android:textSize="18sp" />
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivForecastIcon3"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_weather_placeholder" />
+
+                    <TextView
+                        android:id="@+id/tvForecastDayTemp3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:text="Tuesday: 9°C"/>
+
+                    <TextView
+                        android:id="@+id/tvForecastDesc3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:text="overcast clouds"/>
+                </LinearLayout>
+
             </LinearLayout>
-        </LinearLayout>
+        </HorizontalScrollView>
     </LinearLayout>
 </ScrollView>

@@ -78,8 +78,6 @@ class HomeFragment : Fragment() {
     }
     private fun customTransformation(): Transformation =
         RoundedTransformationBuilder()
-            .borderColor(Color.WHITE)
-            .borderWidthDp(1F)
             .cornerRadiusDp(40F)
             .oval(true)
             .build()
@@ -107,19 +105,22 @@ class HomeFragment : Fragment() {
                 val iconUrl = "https://openweathermap.org/img/wn/$iconCode@2x.png"
                 val temp = String.format("%.0f°C", forecastDetail.main.temp)
                 val description = forecastDetail.weather.firstOrNull()?.description ?: "No description"
-                val forecastText = "$dayOfWeek: $temp, $description"
+                val forecastText = "$dayOfWeek: $temp"
 
                 when (index) {
                     0 -> {
-                        binding.tvForecast1.text = forecastText
-                        Picasso.get().load(iconUrl).into(binding.ivForecastIcon1)
-                    }
+                    binding.tvForecastDayTemp1.text = forecastText
+                    binding.tvForecastDesc1.text = description
+                    Picasso.get().load(iconUrl).into(binding.ivForecastIcon1)
+                }
                     1 -> {
-                        binding.tvForecast2.text = forecastText
+                        binding.tvForecastDayTemp2.text = forecastText
+                        binding.tvForecastDesc2.text = description
                         Picasso.get().load(iconUrl).into(binding.ivForecastIcon2)
                     }
                     2 -> {
-                        binding.tvForecast3.text = forecastText
+                        binding.tvForecastDayTemp3.text = forecastText
+                        binding.tvForecastDesc3.text = description
                         Picasso.get().load(iconUrl).into(binding.ivForecastIcon3)
                     }
                 }
