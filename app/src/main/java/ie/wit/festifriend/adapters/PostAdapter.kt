@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -17,12 +18,14 @@ class PostAdapter(
     private var posts: List<PostModel>,
     private val currentUserId: String,
     private val onEdit: (PostModel) -> Unit,
-    private val onDelete: (PostModel) -> Unit
+    private val onDelete: (PostModel) -> Unit,
+    private val onLike: (String) -> Unit,
+
 ) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_post, parent, false)
-        return PostViewHolder(view, onEdit, onDelete, currentUserId)
+        return PostViewHolder(view, onEdit, onDelete, onLike, currentUserId)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
@@ -32,15 +35,11 @@ class PostAdapter(
 
     override fun getItemCount() = posts.size
 
-    fun updatePosts(newPosts: List<PostModel>) {
-        posts = newPosts
-        notifyDataSetChanged()
-    }
-
     class PostViewHolder(
         itemView: View,
         private val onEdit: (PostModel) -> Unit,
         private val onDelete: (PostModel) -> Unit,
+        private val onLike: (String) -> Unit,
         private val currentUserId: String
     ) : RecyclerView.ViewHolder(itemView) {
         private val postImageView: ImageView = itemView.findViewById(R.id.postImageView)
@@ -49,11 +48,11 @@ class PostAdapter(
         private val postTimestamp: TextView = itemView.findViewById(R.id.postTimestamp)
         private val editPostButton: Button = itemView.findViewById(R.id.editPostButton)
         private val deletePostButton: Button = itemView.findViewById(R.id.deletePostButton)
+        private val likePostButton: ImageButton = itemView.findViewById(R.id.likePostButton)
+        private val likeCountTextView: TextView = itemView.findViewById(R.id.likeCountTextView)
 
         fun bind(post: PostModel) {
-            post.imageUrl?.let {
-                Picasso.get().load(it).into(postImageView)
-            }
+            Picasso.get().load(post.imageUrl).into(postImageView)
             postTextView.text = post.text
             postUserName.text = post.userName ?: "Anonymous"
             postTimestamp.text = DateFormat.getDateTimeInstance().format(Date(post.timestamp))
@@ -63,6 +62,24 @@ class PostAdapter(
 
             editPostButton.setOnClickListener { onEdit(post) }
             deletePostButton.setOnClickListener { onDelete(post) }
+            likePostButton.setOnClickListener {
+                post.id?.let(onLike)
+            }
+
+            val userLiked = post.userActions[currentUserId] ?: false
+            if (userLiked) {
+                likePostButton.setImageResource(R.drawable.ic_liked)
+            } else {
+                likePostButton.setImageResource(R.drawable.ic_unliked)
+            }
+
+            likeCountTextView.text = "${post.likes} Likes"
+
         }
+    }
+
+    fun updatePosts(newPosts: List<PostModel>) {
+        posts = newPosts
+        notifyDataSetChanged()
     }
 }

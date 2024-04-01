@@ -39,6 +39,5 @@
     <string name="festival_image">Festival image</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
-
-
+    <string name="like">Like</string>
 </resources>

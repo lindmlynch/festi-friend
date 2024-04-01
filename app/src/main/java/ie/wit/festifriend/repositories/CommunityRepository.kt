@@ -56,6 +56,32 @@ class CommunityRepository {
             }
     }
 
+    fun likePost(postId: String, userId: String, onComplete: (Boolean) -> Unit) {
+        val postRef = dbPosts.child(postId)
+        postRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val post = mutableData.getValue(PostModel::class.java)
+                    ?: return Transaction.success(mutableData)
+
+                val userActions = post.userActions.toMutableMap()
+                if (userActions[userId] == true) {
+                    post.likes = post.likes - 1
+                    userActions.remove(userId)
+                } else {
+                    post.likes = post.likes + 1
+                    userActions[userId] = true
+                }
+                post.userActions = userActions
+                mutableData.value = post
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                onComplete(committed && databaseError == null)
+            }
+        })
+    }
+
     fun updatePost(postId: String, updatedPost: PostModel, onComplete: (Boolean) -> Unit) {
         dbPosts.child(postId).setValue(updatedPost).addOnCompleteListener { task ->
             onComplete(task.isSuccessful)

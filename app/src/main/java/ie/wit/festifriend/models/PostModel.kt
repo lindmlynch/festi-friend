@@ -10,5 +10,7 @@ data class PostModel(
     var userName: String? = "",
     var text: String? = "",
     var imageUrl: String? = "",
-    var timestamp: Long = System.currentTimeMillis()
+    var timestamp: Long = System.currentTimeMillis(),
+    var likes: Int = 0,
+    var userActions: Map<String, Boolean> = emptyMap()
 ): Parcelable

@@ -43,16 +43,35 @@
         app:layout_constraintTop_toBottomOf="@id/postUserName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/editPostButton"
         tools:text="Timestamp" />
+
+    <ImageButton
+        android:id="@+id/likePostButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_unliked"
+        android:contentDescription="@string/like"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/postTimestamp"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/likeCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/likePostButton"
+        app:layout_constraintBottom_toBottomOf="@id/likePostButton"
+        app:layout_constraintTop_toTopOf="@id/likePostButton"
+        android:text="0 Likes"
+        android:layout_marginStart="4dp"/>
 
     <Button
         android:id="@+id/editPostButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/edit"
-        app:layout_constraintTop_toBottomOf="@id/postTimestamp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/deletePostButton"
+        app:layout_constraintTop_toBottomOf="@id/likePostButton"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"/>
 
@@ -61,11 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/delete"
-        app:layout_constraintTop_toBottomOf="@id/postTimestamp"
         app:layout_constraintStart_toEndOf="@id/editPostButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
+        app:layout_constraintTop_toTopOf="@id/editPostButton"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-

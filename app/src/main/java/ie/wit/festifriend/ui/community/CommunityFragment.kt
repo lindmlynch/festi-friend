@@ -53,7 +53,11 @@ class CommunityFragment : Fragment() {
                 } ?: run {
                     Toast.makeText(context, "Error: Post ID is null.", Toast.LENGTH_LONG).show()
                 }
-            }
+            },
+            onLike = { postId ->
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                communityViewModel.likePost(postId, userId)
+            },
         )
         binding.postRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -67,7 +71,6 @@ class CommunityFragment : Fragment() {
             findNavController().navigate(action)
         }
     }
-
 
     private fun observeViewModel() {
         communityViewModel.posts.observe(viewLifecycleOwner) { posts ->

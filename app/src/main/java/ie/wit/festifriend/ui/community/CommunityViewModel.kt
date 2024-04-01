@@ -75,4 +75,14 @@ class CommunityViewModel @Inject constructor(private val repository: CommunityRe
             }
         }
     }
+
+    fun likePost(postId: String, userId: String) {
+        viewModelScope.launch {
+            repository.likePost(postId, userId) { success ->
+                if (success) {
+                    fetchPosts()
+                }
+            }
+        }
+    }
 }
