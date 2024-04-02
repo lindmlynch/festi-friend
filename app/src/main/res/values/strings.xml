@@ -40,4 +40,12 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="like">Like</string>
+    <string name="festival_updates">Festival Updates</string>
+    <string name="live_updates_placeholder">Live updates will be shown here</string>
+    <string name="weather_dingle">Weather Dingle</string>
+    <string name="forecast_friday_temp">Friday: 9°C</string>
+    <string name="forecast_description">overcast clouds</string>
+    <string name="forecast_saturday_temp">Saturday: 9°C</string>
+    <string name="forecast_sunday_temp">Sunday: 9°C</string>
+
 </resources>

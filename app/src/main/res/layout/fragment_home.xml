@@ -24,7 +24,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Festival Updates"
+            android:text="@string/festival_updates"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:textColor="@color/ov_beige"
             android:gravity="center"
@@ -39,12 +39,12 @@
             android:background="@drawable/updates_background"
             android:padding="16dp"
             android:textSize="18sp"
-            android:text="Live updates will be shown here"/>
+            android:text="@string/live_updates_placeholder"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Weather Dingle"
+            android:text="@string/weather_dingle"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:textColor="@color/ov_beige"
             android:gravity="center"
@@ -82,7 +82,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        android:text="Friday: 9°C"/>
+                        android:text="@string/forecast_friday_temp"/>
 
                     <TextView
                         android:id="@+id/tvForecastDesc1"
@@ -90,7 +90,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        android:text="overcast clouds"/>
+                        android:text="@string/forecast_description"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -112,7 +112,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        android:text="Saturday: 9°C"/>
+                        android:text="@string/forecast_saturday_temp"/>
 
                     <TextView
                         android:id="@+id/tvForecastDesc2"
@@ -120,7 +120,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        android:text="overcast clouds"/>
+                        android:text="@string/forecast_description"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -142,7 +142,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        android:text="Tuesday: 9°C"/>
+                        android:text="@string/forecast_sunday_temp"/>
 
                     <TextView
                         android:id="@+id/tvForecastDesc3"
@@ -150,7 +150,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        android:text="overcast clouds"/>
+                        android:text="@string/forecast_description"/>
                 </LinearLayout>
 
             </LinearLayout>
